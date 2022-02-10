@@ -36,7 +36,10 @@ ARG TRITON_MODEL_ANALYZER_REPO_TAG=main
 ARG CMAKE_UBUNTU_VERSION=20.04
 ARG TRITON_ENABLE_GPU=ON
 
-FROM ${BASE_IMAGE}
+#
+# Multistage docker
+#
+FROM ${BASE_IMAGE} AS build
 
 ARG TARGETPLATFORM
 
@@ -126,7 +129,15 @@ RUN cmake -DCMAKE_INSTALL_PREFIX=/workspace/install \
 RUN make -j16 cc-clients python-clients java-clients && \
     rm -fr ~/.m2
 
+#
+# Collect the artifacts into the final image
+#
+FROM ${BASE_IMAGE}
+
 WORKDIR /workspace
+COPY TRITON_VERSION .
+COPY --from=build /workspace/install/ install/
+
 RUN cd install && \
     export VERSION=`cat /workspace/TRITON_VERSION` && \
     tar zcf /workspace/v$VERSION.clients.tar.gz *
@@ -142,10 +153,21 @@ COPY qa/images/mug.jpg images/mug.jpg
 # Install the dependencies needed to run the client examples. These
 # are not needed for building but including them allows this image to
 # be used to run the client examples.
-RUN pip3 install --upgrade numpy pillow attrdict && \
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+            curl \
+            libssl-dev \
+            zlib1g-dev \
+            python3 \
+            python3-pip \
+            vim \
+            default-jdk && \
+    pip3 install --upgrade pip && \
+    pip3 install --upgrade grpcio-tools && \
+    pip3 install --upgrade numpy pillow attrdict && \
     find install/python/ -maxdepth 1 -type f -name \
          "tritonclient-*linux*.whl" | xargs printf -- '%s[all]' | \
-    xargs pip3 install --upgrade
+         xargs pip3 install --upgrade
 
 # Install DCGM
 RUN if [ "$TRITON_ENABLE_GPU" = "ON" ]; then \

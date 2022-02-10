@@ -171,10 +171,10 @@ for l in $WHLS; do
 done
 
 # Check wheel installation
-python -c """import tritonclient; import tritonclient.grpc; import tritonclient.http; \
-          import tritonclient.utils; import tritonclient.grpc.model_config_pb2; \
-          import tritonclient.grpc.service_pb2; import tritonclient.grpc.service_pb2_grpc; \
-          import tritonclient.utils.cuda_shared_memory; import tritonclient.utils.shared_memory"""
+python3 -c """import tritonclient; import tritonclient.grpc; import tritonclient.http; \
+           import tritonclient.utils; import tritonclient.grpc.model_config_pb2; \
+           import tritonclient.grpc.service_pb2; import tritonclient.grpc.service_pb2_grpc; \
+           import tritonclient.utils.cuda_shared_memory; import tritonclient.utils.shared_memory"""
 RET=$(($RET+$?))
 
 EXECUTABLES="perf_analyzer perf_client"
