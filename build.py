@@ -78,7 +78,7 @@ EXAMPLE_BACKENDS = ['identity', 'square', 'repeat']
 CORE_BACKENDS = ['ensemble']
 NONCORE_BACKENDS = [
     'tensorflow1', 'tensorflow2', 'onnxruntime', 'python', 'dali', 'pytorch',
-    'openvino', 'fil', 'fastertransformer', 'tensorrt', 'armnn_tflite'
+    'openvino', 'fil', 'fastertransformer', 'tensorrt', 'armnn_tflite', 'openppl'
 ]
 EXAMPLE_REPOAGENTS = ['checksum']
 FLAGS = None
@@ -191,11 +191,19 @@ def gitclone(cwd, repo, tag, subdir, org):
             rmdir(clone_dir)
 
         if not os.path.exists(clone_dir):
-            p = subprocess.Popen([
-                'git', 'clone', '--recursive', '--single-branch', '--depth=1',
-                '-b', tag, '{}/{}.git'.format(org, repo), subdir
-            ],
-                                 cwd=cwd)
+            if repo != 'openppl_backend':
+                p = subprocess.Popen([
+                    'git', 'clone', '--recursive', '--single-branch', '--depth=1',
+                    '-b', tag, '{}/{}.git'.format(org, repo), subdir
+                ],
+                                    cwd=cwd)
+            else:
+                print("in here")
+                p = subprocess.Popen([
+                    'git', 'clone', '--recursive', '--single-branch', '--depth=1',
+                    'https://github.com/Si-XU/Triton_OpenPPL_Backend.git', subdir
+                ],
+                                    cwd=cwd)
             p.wait()
             fail_if(
                 p.returncode != 0,
@@ -467,6 +475,8 @@ def backend_cmake_args(images, components, be, install_dir, library_paths):
         args = []
     elif be == 'tensorrt':
         args = tensorrt_cmake_args()
+    elif be == 'openppl':
+        args = openppl_cmake_args()
     elif be in EXAMPLE_BACKENDS:
         args = []
     else:
@@ -644,6 +654,10 @@ def tensorflow_cmake_args(ver, images, library_paths):
 def dali_cmake_args():
     return [
         cmake_backend_enable('dali', 'TRITON_DALI_SKIP_DOWNLOAD', False),
+    ]
+
+def openppl_cmake_args():
+    return [
     ]
 
 

@@ -233,6 +233,12 @@ GetBackendTypeFromPlatform(const std::string& platform_name)
   }
 #endif  // TRITON_ENABLE_PYTORCH
 
+#ifdef TRITON_ENABLE_OPENPPL
+  if (platform_name == kOpenPPLOnnxPlatform) {
+    return BackendType::BACKEND_TYPE_OPENPPL;
+  }
+#endif  // TRITON_ENABLE_OPENPPL
+
   return BackendType::BACKEND_TYPE_UNKNOWN;
 }
 
@@ -266,6 +272,12 @@ GetBackendType(const std::string& backend_name)
     return BackendType::BACKEND_TYPE_PYTORCH;
   }
 #endif  // TRITON_ENABLE_PYTORCH
+
+#ifdef TRITON_ENABLE_OPENPPL
+  if (backend_name == kOpenPPLBackend) {
+    return BackendType::BACKEND_TYPE_OPENPPL;
+  }
+#endif  // TRITON_ENABLE_OPENPPL
 
   return BackendType::BACKEND_TYPE_UNKNOWN;
 }

@@ -62,6 +62,12 @@ constexpr char kPyTorchLibTorchFilename[] = "model.pt";
 constexpr char kPyTorchBackend[] = "pytorch";
 #endif  // TRITON_ENABLE_PYTORCH
 
+#ifdef TRITON_ENABLE_OPENPPL
+constexpr char kOpenPPLOnnxPlatform[] = "openppl_onnx";
+constexpr char kOpenPPLOnnxFilename[] = "model.onnx";
+constexpr char kOpenPPLBackend[] = "openppl";
+#endif  // TRITON_ENABLE_OPENPPL
+
 #ifdef TRITON_ENABLE_ENSEMBLE
 constexpr char kEnsemblePlatform[] = "ensemble";
 #endif  // TRITON_ENABLE_ENSEMBLE

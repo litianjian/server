@@ -946,6 +946,31 @@ AutoCompleteBackendFields(
     return Status::Success;
   }
 #endif  // TRITON_ENABLE_PYTORCH
+#ifdef TRITON_ENABLE_OPENPPL
+  if (config->backend().empty()) {
+    if ((config->platform() == kOpenPPLOnnxPlatform) ||
+        (config->default_model_filename() == kOpenPPLOnnxFilename)) {
+      config->set_backend(kOpenPPLBackend);
+    } else if (
+        config->platform().empty() &&
+        config->default_model_filename().empty() && has_version) {
+      if (version_dir_content.find(kOpenPPLOnnxFilename) !=
+          version_dir_content.end()) {
+        // ONNX model can be a file or a directory in the case of large model
+        config->set_backend(kOpenPPLBackend);
+      }
+    }
+  }
+  if (config->backend() == kOpenPPLBackend) {
+    if (config->platform().empty()) {
+      config->set_platform(kOpenPPLOnnxPlatform);
+    }
+    if (config->default_model_filename().empty()) {
+      config->set_default_model_filename(kOpenPPLOnnxFilename);
+    }
+    return Status::Success;
+  }
+#endif  // TRITON_ENABLE_OPENPPL
   return Status::Success;
 }
 
